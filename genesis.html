@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Quiz de Gênesis — Velho Testamento</title>
+<style>
+  :root{
+    --bg:#040405; --panel:#0b0b0c; --gold:#D4AF37; --muted:rgba(212,175,55,0.12);
+    --text:#efe6c8;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;color:var(--text);background:linear-gradient(180deg,#000 0%, #081016 60%);}
+  .wrap{max-width:980px;margin:24px auto;padding:18px;}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.02);box-shadow:0 12px 40px rgba(0,0,0,0.6);}
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  header h1{margin:0;font-size:18px;display:flex;align-items:center;gap:10px}
+  header .meta{font-size:13px;color:#cbb77a;opacity:0.9}
+  .layout{display:grid;grid-template-columns:1fr 340px;gap:16px}
+  @media(max-width:880px){ .layout{grid-template-columns:1fr} }
+  .panel{padding:14px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02) }
+  .logo{width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,#0b0b0c,#111);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--gold);font-size:16px}
+  input[type=text]{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(212,175,55,0.12);background:transparent;color:var(--text);font-size:15px}
+  .btn{display:inline-block;padding:12px 16px;border-radius:12px;border:none;font-weight:700;cursor:pointer}
+  .btn.primary{background:linear-gradient(90deg,#2b2b2b,#111);color:var(--gold);border:1px solid rgba(212,175,55,0.18);box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+  .btn.ghost{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.04)}
+  .small{font-size:13px;color:rgba(255,255,255,0.7)}
+  .qscreen{display:none;animation:appear .26s ease both}
+  .active{display:block}
+  @keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;color:#cdbb82}
+  .q-text{font-size:18px;font-weight:700;margin-bottom:12px;color:var(--text)}
+  .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .choice{background:linear-gradient(180deg,#0b0b0c,#121212);padding:12px;border-radius:10px;border:1px solid rgba(212,175,55,0.06);cursor:pointer;text-align:left;font-weight:700}
+  .choice:active{transform:scale(0.997)}
+  .failure-banner{position:fixed;left:50%;transform:translateX(-50%);top:18px;padding:10px 16px;border-radius:10px;background:linear-gradient(90deg,#7b1530,#b22a4a);color:white;font-weight:800;display:none;z-index:999}
+  .stat{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.02)}
+  .leader{max-height:280px;overflow:auto;margin-top:8px}
+  .tiny{font-size:12px;color:rgba(255,255,255,0.6)}
+  .impossible{color:#cc6f6f;font-weight:800}
+  .controls{display:flex;gap:8px;align-items:center}
+  button.full{width:100%}
+  /* Touch friendly sizes */
+  .choice, .btn{min-height:48px;font-size:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>📜 GÊNESIS — Quiz (Velho Testamento)</h1>
+    <div class="meta">50 perguntas • se errar volta à 1ª • tempo continua</div>
+  </header>
+
+  <div class="layout">
+    <!-- LEFT: gameplay -->
+    <div class="panel card">
+      <!-- START SCREEN -->
+      <section id="screen-start" class="qscreen active" aria-hidden="false">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="logo">VT<br><span style="font-size:11px;color:var(--gold)">GÊNESIS</span></div>
+          <div>
+            <div style="font-weight:800;font-size:16px">Quiz — Gênesis</div>
+            <div class="tiny" style="margin-top:6px">Digite seu nome e toque em <strong>Começar</strong>. O cronômetro inicia quando você tocar Iniciar e NÃO zera se errar.</div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <label class="tiny">Seu nome</label>
+          <input id="playerName" type="text" placeholder="Ex: João" />
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <button id="btnStart" class="btn primary full">Começar</button>
+            <button id="btnResetAll" class="btn ghost">Resetar Tudo</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUESTION SCREENS (one per question) -->
+      <div id="questionsWrapper"></div>
+
+      <!-- FAIL SCREEN -->
+      <section id="screen-fail" class="qscreen" aria-hidden="true">
+        <div style="text-align:center">
+          <div style="font-size:22px;font-weight:900;color:#b2313b">MISERICÓRDIA</div>
+          <div id="failText" style="margin-top:12px;font-weight:800;font-size:16px"></div>
+          <div style="margin-top:14px;display:flex;gap:8px;justify-content:center">
+            <button id="btnRestartFromFail" class="btn primary">Recomeçar (volta à 1ª)</button>
+            <button id="btnResetFromFail" class="btn ghost">Resetar Tudo</button>
+          </div>
+          <div class="tiny" style="margin-top:10px">O tempo NÃO é zerado — ele continua contando enquanto você tenta de novo.</div>
+        </div>
+      </section>
+
+      <!-- FINAL SCREEN -->
+      <section id="screen-final" class="qscreen" aria-hidden="true">
+        <div style="text-align:center">
+          <div style="font-size:22px;font-weight:900;color:var(--gold)">🎉 PARABÉNS!</div>
+          <div id="finalText" style="margin-top:12px;font-weight:800;font-size:16px"></div>
+          <div style="margin-top:12px" class="tiny">Tempo: <span id="finalTime" style="font-weight:900;color:var(--gold)"></span></div>
+          <div style="margin-top:12px;display:flex;gap:8px;justify-content:center">
+            <button id="btnSave" class="btn primary">Salvar no ranking</button>
+            <button id="btnPlayAgain" class="btn ghost">Jogar de novo (mesmo nome)</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- RIGHT: status & leaderboard -->
+    <aside class="panel card" style="display:flex;flex-direction:column;gap:12px">
+      <div class="stat">
+        <div>
+          <div class="tiny">Jogador</div>
+          <div id="labelPlayer" style="font-weight:800">—</div>
+        </div>
+        <div style="text-align:right">
+          <div class="tiny">Nível</div>
+          <div style="font-weight:800;color:var(--gold)">Velho Testamento</div>
+        </div>
+      </div>
+
+      <div class="stat">
+        <div>
+          <div class="tiny">Cronômetro</div>
+          <div id="timerLarge" style="font-weight:900;font-size:18px">00:00.000</div>
+        </div>
+        <div style="text-align:right">
+          <div class="tiny">Progresso</div>
+          <div id="progressSmall" style="font-weight:800">0 / 50</div>
+        </div>
+      </div>
+
+      <div class="stat" style="flex-direction:column;align-items:flex-start">
+        <div class="tiny" style="margin-bottom:8px">Ranking local (melhores tempos)</div>
+        <div class="leader" id="leaderboard"></div>
+        <div style="width:100%;display:flex;gap:8px;margin-top:8px">
+          <button id="btnClear" class="btn ghost" style="flex:1">Limpar ranking</button>
+          <button onclick="location.href='velho.html'" class="btn ghost" style="flex:1">Voltar</button>
+        </div>
+      </div>
+
+      <div class="tiny">Dica: últimas 20 perguntas são mais difíceis; últimas 5 quase impossíveis.</div>
+    </aside>
+  </div>
+</div>
+
+<div id="floatingFail" class="failure-banner"></div>
+
+<script>
+/* ========== QUESTIONS for GÊNESIS (50) ========== */
+/* Mixed: first 30 medium, next 15 harder, last 5 impossible */
+const QUESTIONS = [
+  {id:1,type:'📖',q:'Quem criou os céus e a terra?',choices:['Deus','Adão','Moisés','Abraão'],answer:0},
+  {id:2,type:'📖',q:'Quem foi o primeiro homem?',choices:['Noé','Adão','Caim','Seth'],answer:1},
+  {id:3,type:'📖',q:'Quem foi a primeira mulher?',choices:['Eva','Sara','Rebeca','Lia'],answer:0},
+  {id:4,type:'📖',q:'Em quantos dias Deus criou o mundo?',choices:['5','6','7','8'],answer:1},
+  {id:5,type:'📖',q:'O que Deus fez no sétimo dia?',choices:['Criou o homem','Descansou','Fez os animais','Nada'],answer:1},
+  {id:6,type:'📖',q:'Onde Deus colocou Adão e Eva?',choices:['Monte Sinai','Éden','Canaã','Babilônia'],answer:1},
+  {id:7,type:'📖',q:'Quem foi o primeiro assassino?',choices:['Lameque','Caim','Abel','Nimrode'],answer:1},
+  {id:8,type:'📖',q:'Quem construiu a arca?',choices:['Abraão','Moisés','Noé','Elias'],answer:2},
+  {id:9,type:'📖',q:'Quantos dias choveu no dilúvio?',choices:['20','30','40','60'],answer:2},
+  {id:10,type:'📖',q:'Qual o sinal da aliança após o dilúvio?',choices:['Estrela','Arco-íris','Pomba','Monte'],answer:1},
+  {id:11,type:'📖',q:'Quem foi o pai de Abraão?',choices:['Terá','Noé','Sem','Ló'],answer:0},
+  {id:12,type:'📖',q:'Com quantos anos Abraão saiu de Harã?',choices:['50','75','100','99'],answer:1},
+  {id:13,type:'📖',q:'Quem era esposa de Abraão?',choices:['Sara','Rebeca','Lia','Raquel'],answer:0},
+  {id:14,type:'📖',q:'Quem foi o filho prometido a Abraão?',choices:['Ismael','Isaque','Jacó','Esaú'],answer:1},
+  {id:15,type:'📖',q:'Deus pediu que Abraão sacrificasse quem?',choices:['Sara','Isaque','Ismael','Jacó'],answer:1},
+  {id:16,type:'📖',q:'Quem foi o irmão de Isaque?',choices:['Ismael','Jacó','Esaú','Ló'],answer:2},
+  {id:17,type:'📖',q:'Quem foi esposa de Isaque?',choices:['Rebeca','Sara','Raquel','Lia'],answer:0},
+  {id:18,type:'📖',q:'Quem eram os filhos de Isaque?',choices:['José e Benjamim','Jacó e Esaú','Caim e Abel','Rúben e Simeão'],answer:1},
+  {id:19,type:'📖',q:'Quem enganou Isaque para receber a bênção?',choices:['Jacó','Esaú','José','Rúben'],answer:0},
+  {id:20,type:'📖',q:'Com quem Jacó lutou à noite?',choices:['Um homem','Um anjo','Esaú','Deus'],answer:1},
+  {id:21,type:'📖',q:'Qual foi o novo nome de Jacó?',choices:['Israel','Judá','José','Benjamim'],answer:0},
+  {id:22,type:'📖',q:'Quantos filhos Jacó teve?',choices:['10','12','14','7'],answer:1},
+  {id:23,type:'📖',q:'Qual era o filho preferido de Jacó?',choices:['Rúben','José','Benjamim','Levi'],answer:1},
+  {id:24,type:'📖',q:'O que os irmãos de José fizeram com ele?',choices:['O mataram','O venderam','O esconderam','O libertaram'],answer:1},
+  {id:25,type:'📖',q:'Para onde José foi levado?',choices:['Babilônia','Egito','Canaã','Assíria'],answer:1},
+  {id:26,type:'📖',q:'Quem interpretou sonhos no Egito?',choices:['Faraó','José','Moisés','Aarão'],answer:1},
+  {id:27,type:'📖',q:'Quem se tornou governador do Egito?',choices:['Jacó','Faraó','José','Esaú'],answer:2},
+  {id:28,type:'📖',q:'Quem veio ao Egito buscar alimento?',choices:['Os irmãos de José','Os cananeus','Os filisteus','Ninguém'],answer:0},
+  {id:29,type:'📖',q:'Quem foi acusado falsamente na casa do Faraó?',choices:['José','José (falso)','Benjamim','Jacó'],answer:0},
+  {id:30,type:'📖',q:'Quem morreu com 147 anos no Egito (segundo tradição)?',choices:['José','Jacó','Isaque','Abraão'],answer:1},
+
+  // 31-45 difíceis
+  {id:31,type:'🔮',q:'Quem foi a mãe de Ismael?',choices:['Sara','Agar','Rebeca','Lia'],answer:1},
+  {id:32,type:'🔮',q:'Quem era o rei de Gerar que tomou Sara?',choices:['Abimeleque','Faraó','Hamurabi','Nimrode'],answer:0},
+  {id:33,type:'🔮',q:'Quem abençoou Abraão após a vitória sobre os reis?',choices:['Melquisedeque','Lot','Sem','Eliezer'],answer:0},
+  {id:34,type:'🔮',q:'De onde vinha Abraão?',choices:['Ur dos Caldeus','Babilônia','Canaã','Egito'],answer:0},
+  {id:35,type:'🔮',q:'Quem pediu para ser enterrado na caverna de Macpela?',choices:['Abraão','Jacó','Sara','José'],answer:1},
+  {id:36,type:'🔮',q:'Quem era o filho mais velho de Jacó?',choices:['Rúben','Simeão','Judá','Levi'],answer:0},
+  {id:37,type:'🔮',q:'Qual foi o sonho de Faraó que José interpretou?',choices:['7 vacas e 7 espigas','7 estrelas e 7 luas','3 copos e 3 pães','10 montanhas'],answer:0},
+  {id:38,type:'🔮',q:'Quem impediu que os irmãos matassem José?',choices:['Judá','Rúben','Benjamim','Levi'],answer:1},
+  {id:39,type:'🔮',q:'Quem foi esposa de José?',choices:['Asenate','Raquel','Lia','Sara'],answer:0},
+  {id:40,type:'🔮',q:'Quem foram os filhos de José?',choices:['Manassés e Efraim','Rúben e Levi','Jacó e Esaú','Benjamim e Dã'],answer:0},
+  {id:41,type:'🔮',q:'Quem era o pai de Ló?',choices:['Harã','Abraão','Noé','Terá'],answer:3},
+  {id:42,type:'🔮',q:'Quem foi vendido pelos irmãos por cerca de quanto (segundo relato)?',choices:['20 peças de prata','30 peças de prata','40 peças de prata','50 peças de prata'],answer:1},
+  {id:43,type:'🔮',q:'Qual o nome do filho mais novo de Jacó?',choices:['Benjamim','Judá','José','Efraim'],answer:0},
+  {id:44,type:'🔮',q:'Quem foi transformado em sal?',choices:['Ló','Sará','A esposa de Ló','Rebeca'],answer:2},
+  {id:45,type:'🔮',q:'Qual era a relação entre Isaque e Ismael?',choices:['Meio-irmãos','Primos','Pai e filho','Tios'],answer:0},
+
+  // 46-50 IMPOSSÍVEIS (respostas que apontam "não é especificado")
+  {id:46,type:'🔮',q:'IMPOSSÍVEL: Qual era a altura exata da arca de Noé em centímetros?',choices:['1.000','1.350','13.500','Não é possível saber'],answer:3,impossible:true},
+  {id:47,type:'🔮',q:'IMPOSSÍVEL: Qual era a cor do solo do Éden?',choices:['Vermelho','Castanho','Não é dito','Dourado'],answer:2,impossible:true},
+  {id:48,type:'🔮',q:'IMPOSSÍVEL: Quantos dias Eva viveu?',choices:['36500','900','Não é dito','150'],answer:2,impossible:true},
+  {id:49,type:'🔮',q:'IMPOSSÍVEL: Quantos degraus tinha a torre de Babel?',choices:['7','100','Não é especificado','10'],answer:2,impossible:true},
+  {id:50,type:'🔮',q:'IMPOSSÍVEL: Qual era o cheiro do jardim do Éden?',choices:['Flores','Frutas','Não é dito','Incenso'],answer:2,impossible:true}
+];
+
+/* ========== STATE ========== */
+let player = '';
+let index = 0; // 0-based index into QUESTIONS
+let started = false;
+let startTimestamp = null;
+let timerInterval = null;
+
+/* ========== DOM ========== */
+const startScreen = document.getElementById('screen-start');
+const questionsWrapper = document.getElementById('questionsWrapper');
+const failScreen = document.getElementById('screen-fail');
+const finalScreen = document.getElementById('screen-final');
+const btnStart = document.getElementById('btnStart');
+const btnResetAll = document.getElementById('btnResetAll');
+const btnRestartFromFail = document.getElementById('btnRestartFromFail');
+const btnResetFromFail = document.getElementById('btnResetFromFail');
+const btnSave = document.getElementById('btnSave');
+const btnPlayAgain = document.getElementById('btnPlayAgain');
+const failText = document.getElementById('failText');
+const finalText = document.getElementById('finalText');
+const finalTime = document.getElementById('finalTime');
+const labelPlayer = document.getElementById('labelPlayer');
+const timerLarge = document.getElementById('timerLarge');
+const progressSmall = document.getElementById('progressSmall');
+const leaderboardEl = document.getElementById('leaderboard');
+const btnClear = document.getElementById('btnClear');
+const floatingFail = document.getElementById('floatingFail');
+
+const TOTAL = QUESTIONS.length;
+
+/* ========== FAILURE MESSAGES (7) ========== */
+const FAIL_MESSAGES = [
+  'MISERICÓRDIA, {name}!',
+  'Ai não... {name}, tenta de novo!',
+  'O céu fechou pra você, {name} 😭',
+  'Ah não — misericórdia, {name}!',
+  'Volta pro começo, {name} — aprende aí!',
+  '{name}, errou feio 😅',
+  'Tenta de novo, servo fiel: {name}!'
+];
+
+/* ========== HELPERS ========== */
+function fmtTime(ms){
+  const s = Math.floor(ms/1000);
+  const mm = Math.floor(s/60).toString().padStart(2,'0');
+  const ss = (s % 60).toString().padStart(2,'0');
+  const msRem = (ms % 1000).toString().padStart(3,'0');
+  return `${mm}:${ss}.${msRem}`;
+}
+function showFloating(text){
+  floatingFail.textContent = text;
+  floatingFail.style.display = 'block';
+  setTimeout(()=> floatingFail.style.opacity = '1',10);
+  setTimeout(()=> { floatingFail.style.opacity = '0'; setTimeout(()=> floatingFail.style.display='none',300); },1600);
+}
+
+/* ========== TIMER ========== */
+function startTimerIfNeeded(){
+  if(startTimestamp === null) startTimestamp = performance.now();
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(()=> {
+    const elapsed = Math.floor(performance.now() - startTimestamp);
+    timerLarge.textContent = fmtTime(elapsed);
+    progressSmall.textContent = `${index}/${TOTAL}`;
+  }, 80);
+}
+function stopTimer(){
+  if(timerInterval){ clearInterval(timerInterval); timerInterval = null; }
+}
+function getElapsed(){
+  if(!startTimestamp) return 0;
+  return Math.floor(performance.now() - startTimestamp);
+}
+
+/* ========== BUILD QUESTION SCREENS ========== */
+function buildQuestionScreens(){
+  questionsWrapper.innerHTML = '';
+  QUESTIONS.forEach((q, idx) => {
+    const sec = document.createElement('section');
+    sec.className = 'qscreen panel';
+    sec.id = 'q-'+idx;
+    // header meta
+    const meta = document.createElement('div'); meta.className='q-meta';
+    meta.innerHTML = `<div class="small">${q.type || '🔹'} ${q.impossible?'<span class="impossible">• IMPOSSÍVEL</span>':''}</div><div class="small">Pergunta ${idx+1} / ${TOTAL}</div>`;
+    // question text
+    const qText = document.createElement('div'); qText.className='q-text'; qText.textContent = q.q;
+    // choices
+    const choices = document.createElement('div'); choices.className='choices';
+    q.choices.forEach((c, ci) => {
+      const b = document.createElement('button');
+      b.className = 'choice';
+      b.innerHTML = `<div style="font-weight:800">${String.fromCharCode(65+ci)}.</div><div style="margin-top:6px">${c}</div>`;
+      b.addEventListener('click', ()=> handleAnswer(idx, ci));
+      choices.appendChild(b);
+    });
+    sec.appendChild(meta); sec.appendChild(qText); sec.appendChild(choices);
+    questionsWrapper.appendChild(sec);
+  });
+}
+
+/* ========== RENDER LEADERBOARD ========== */
+function renderLeaderboard(){
+  const key = 'genesis_quiz_rank';
+  let arr = [];
+  try{ arr = JSON.parse(localStorage.getItem(key) || '[]'); }catch(e){ arr = []; }
+  arr.sort((a,b)=> a.timeMs - b.timeMs);
+  leaderboardEl.innerHTML = '';
+  if(arr.length === 0){ leaderboardEl.innerHTML = '<div class="tiny">Nenhum campeão ainda — seja o primeiro!</div>'; return; }
+  arr.slice(0,10).forEach((r,i)=>{
+    const row = document.createElement('div');
+    row.style.display='flex'; row.style.justifyContent='space-between'; row.style.padding='6px 0'; row.style.borderBottom='1px dashed rgba(255,255,255,0.03)';
+    row.innerHTML = `<div style="font-weight:800">#${i+1} ${escapeHtml(r.name)}</div><div class="tiny">${fmtTime(r.timeMs)}</div>`;
+    leaderboardEl.appendChild(row);
+  });
+}
+
+/* ====== EVENTS & GAME FLOW ====== */
+btnStart.addEventListener('click', ()=>{
+  const nameVal = (document.getElementById('playerName').value || '').trim();
+  if(!nameVal){ const ip = document.getElementById('playerName'); ip.style.border='1px solid #f66'; ip.focus(); setTimeout(()=> ip.style.border='',800); return; }
+  player = nameVal;
+  labelPlayer.textContent = player;
+  index = 0;
+  started = true;
+  buildQuestionScreens();
+  startTimerIfNeeded();
+  showScreenByIndex(0);
+  renderLeaderboard();
+});
+
+btnResetAll.addEventListener('click', ()=>{
+  if(!confirm('Resetar tudo: zera tempo, progresso e nome?')) return;
+  // full reset
+  player = '';
+  index = 0;
+  started = false;
+  startTimestamp = null;
+  stopTimer();
+  timerLarge.textContent = '00:00.000';
+  progressSmall.textContent = `0 / ${TOTAL}`;
+  document.getElementById('playerName').value = '';
+  labelPlayer.textContent = '—';
+  showScreen(startScreen);
+});
+
+btnRestartFromFail.addEventListener('click', ()=>{
+  // go back to first question, time continues (do not reset startTimestamp)
+  index = 0;
+  showScreenByIndex(0);
+});
+
+btnResetFromFail.addEventListener('click', ()=>{
+  if(!confirm('Resetar tudo: zera tempo, progresso e nome?')) return;
+  player = '';
+  index = 0;
+  started = false;
+  startTimestamp = null;
+  stopTimer();
+  timerLarge.textContent = '00:00.000';
+  progressSmall.textContent = `0 / ${TOTAL}`;
+  document.getElementById('playerName').value = '';
+  labelPlayer.textContent = '—';
+  showScreen(startScreen);
+});
+
+btnPlayAgain.addEventListener('click', ()=>{
+  // keep same name, restart run (restart timer)
+  index = 0;
+  startTimestamp = performance.now();
+  startTimerIfNeeded();
+  showScreenByIndex(0);
+});
+
+btnSave.addEventListener('click', ()=>{
+  const elapsed = getElapsed();
+  const key = 'genesis_quiz_rank';
+  let arr = [];
+  try{ arr = JSON.parse(localStorage.getItem(key) || '[]'); }catch(e){ arr=[]; }
+  arr.push({ name: player || '—', timeMs: elapsed, date: new Date().toISOString() });
+  if(arr.length>200) arr = arr.slice(arr.length-200);
+  localStorage.setItem(key, JSON.stringify(arr));
+  renderLeaderboard();
+  alert('Salvo no ranking local!');
+});
+
+btnClear.addEventListener('click', ()=>{
+  if(confirm('Limpar ranking local?')){ localStorage.removeItem('genesis_quiz_rank'); renderLeaderboard(); }
+});
+
+/* ====== ANSWER HANDLING ====== */
+function handleAnswer(qIdx, choiceIdx){
+  if(!started) return;
+  const q = QUESTIONS[qIdx];
+  const correct = (choiceIdx === q.answer);
+  if(correct){
+    // move to next question screen or finish
+    const next = qIdx + 1;
+    index = next;
+    if(next >= TOTAL){
+      // finished
+      const elapsed = getElapsed();
+      finalText.textContent = `PARABÉNS ${player.toUpperCase()} — Você concluiu!`;
+      finalTime.textContent = fmtTime(elapsed);
+      showScreen(finalScreen);
+    } else {
+      showScreenByIndex(next);
+    }
+  } else {
+    // incorrect: show fail screen, reset current index to 0 BUT DO NOT STOP TIMER
+    const tpl = FAIL_MESSAGES[Math.floor(Math.random()*FAIL_MESSAGES.length)];
+    const msg = tpl.replace('{name}', player || 'amigo');
+    failText.textContent = msg;
+    showScreen(failScreen);
+    index = 0;
+    // show floating too
+    showFloating(msg);
+  }
+}
+
+/* ====== UI HELPERS ====== */
+function showScreen(el){
+  document.querySelectorAll('.qscreen').forEach(s=>{ s.classList.remove('active'); s.setAttribute('aria-hidden','true'); });
+  el.classList.add('active'); el.setAttribute('aria-hidden','false');
+}
+function showScreenByIndex(i){
+  const sec = document.getElementById('q-'+i);
+  if(!sec) return;
+  showScreen(sec);
+  // update progress display
+  progressSmall.textContent = `${i}/${TOTAL}`;
+}
+/* basic escape */
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ========== INIT ========== */
+(function init(){
+  buildQuestionScreens();
+  renderLeaderboard();
+  // initial displays
+  timerLarge.textContent = '00:00.000';
+  progressSmall.textContent = `0 / ${TOTAL}`;
+})();
+</script>
+</body>
+</html>

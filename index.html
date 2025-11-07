@@ -5,26 +5,83 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Estudo Bíblico – Escolha seu Quiz</title>
 <style>
-body {
-  background: linear-gradient(135deg, #001a33, #002b55);
-  color: white;
-  font-family: 'Segoe UI', sans-serif;
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-  height: 100vh; text-align: center; margin: 0;
-}
-h1 { font-size: 2em; margin-bottom: 40px; }
-button {
-  font-size: 1.2em; margin: 10px; padding: 15px 40px;
-  border: none; border-radius: 10px; cursor: pointer; transition: 0.3s;
-}
-#velho { background-color: #d4af37; color: black; }
-#novo { background-color: #5cb8ff; color: black; }
-button:hover { transform: scale(1.05); }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+  body{
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(90deg,#0b0b0c 0%,#1c1c1c 48%,#e0ecff 52%,#cddfff 100%);
+    color:white;
+    overflow:hidden;
+  }
+  .container{
+    text-align:center;
+    z-index:2;
+  }
+  h1{
+    font-size:2em;
+    margin-bottom:20px;
+    color:#fff;
+    text-shadow:0 0 15px rgba(255,255,255,0.2);
+  }
+  .buttons{
+    display:flex;
+    gap:30px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .btn{
+    padding:15px 30px;
+    border:none;
+    font-size:1.2em;
+    font-weight:700;
+    border-radius:12px;
+    cursor:pointer;
+    transition:0.3s;
+    text-decoration:none;
+  }
+  .old{
+    background:linear-gradient(180deg,#1c1c1c,#2b2b2b);
+    border:1px solid #d4af37;
+    color:#f5e6a0;
+  }
+  .old:hover{
+    background:linear-gradient(180deg,#2b2b2b,#3a3a3a);
+    transform:scale(1.05);
+  }
+  .new{
+    background:linear-gradient(180deg,#e0ecff,#cddfff);
+    border:1px solid #8ab4f8;
+    color:#003366;
+  }
+  .new:hover{
+    background:linear-gradient(180deg,#cddfff,#b9d4ff);
+    transform:scale(1.05);
+  }
+  .divider{
+    position:absolute;
+    left:50%;
+    top:0;
+    height:100%;
+    width:2px;
+    background:rgba(255,255,255,0.1);
+  }
+  @media(max-width:600px){
+    .buttons{flex-direction:column;gap:20px;}
+    .btn{width:220px;}
+  }
 </style>
 </head>
 <body>
-<h1>📖 Estudo Bíblico<br>Escolha seu Quiz</h1>
-<button id="velho" onclick="location.href='velho.html'">🕎 Velho Testamento</button>
-<button id="novo" onclick="location.href='novo.html'">✝️ Novo Testamento</button>
+  <div class="divider"></div>
+  <div class="container">
+    <h1>📜 Estudo Bíblico 📖<br>Escolha seu Testamento</h1>
+    <div class="buttons">
+      <a href="velho.html" class="btn old">🕎 Velho Testamento</a>
+      <a href="novo.html" class="btn new">✝️ Novo Testamento</a>
+    </div>
+  </div>
 </body>
 </html>
+

@@ -1,193 +1,445 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Êxodo – Estudo Bíblico</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Quiz de Êxodo — Velho Testamento</title>
 <style>
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(180deg, #0a0a0a, #1a1a1a);
-  color: #f5e6a0;
-  text-align: center;
-  user-select: none;
+:root{
+  --bg:#040405; --panel:#0b0b0c; --gold:#D4AF37; --bronze:#b8860b; --text:#efe6c8;
 }
-.screen { display: none; padding: 30px; }
-.active { display: block; }
-button {
-  background: linear-gradient(180deg, #b8860b, #8b6508);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 12px 24px;
-  font-size: 1.1em;
-  margin: 10px;
-  cursor: pointer;
-  transition: 0.2s;
+html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:linear-gradient(180deg,#000 0%, #071018 60%);color:var(--text);}
+.container{max-width:980px;margin:20px auto;padding:18px;}
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.02);box-shadow:0 12px 40px rgba(0,0,0,0.6);}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.header h1{margin:0;font-size:18px;color:var(--gold)}
+.header .meta{font-size:13px;color:rgba(212,175,55,0.9)}
+.layout{display:grid;grid-template-columns:1fr 340px;gap:16px}
+@media(max-width:880px){ .layout{grid-template-columns:1fr} }
+.panel{padding:14px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02) }
+.logo{width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,#0b0b0c,#111);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--gold);font-size:16px}
+input[type=text]{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(212,175,55,0.12);background:transparent;color:var(--text);font-size:15px}
+.btn{display:inline-block;padding:12px 16px;border-radius:12px;border:none;font-weight:700;cursor:pointer}
+.btn.primary{background:linear-gradient(90deg,#2b2b2b,#111);color:var(--bronze);border:1px solid rgba(212,175,55,0.18);box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.04)}
+.small{font-size:13px;color:rgba(255,255,255,0.7)}
+.qscreen{display:none;animation:appear .26s ease both}
+.active{display:block}
+@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;color:#cdbb82}
+.q-text{font-size:18px;font-weight:700;margin-bottom:12px;color:var(--text)}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.choice{
+  background: linear-gradient(180deg, #161616, #232323);
+  padding:14px;border-radius:10px;border:1px solid rgba(212,175,55,0.22);
+  color:#fff;cursor:pointer;text-align:left;font-weight:800;min-height:52px;font-size:15px;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s;
 }
-button:hover { transform: scale(1.05); }
-input {
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  font-size: 1.1em;
-  text-align: center;
-}
-.choice {
-  background: linear-gradient(180deg, #1f1f1f, #292929);
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(212,175,55,0.3);
-  color: #f5e6a0;
-  cursor: pointer;
-  margin: 10px auto;
-  width: 90%;
-  max-width: 400px;
-  transition: 0.2s;
-}
-.choice:hover { background: linear-gradient(180deg, #2b2b2b, #3b3b3b); }
-#timer { position: fixed; top: 10px; right: 20px; font-size: 1.1em; color: #d4af37; }
+.choice:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(0,0,0,0.6);background:linear-gradient(180deg,#232323,#2b2b2b)}
+.failure-banner{position:fixed;left:50%;transform:translateX(-50%);top:18px;padding:10px 16px;border-radius:10px;background:linear-gradient(90deg,#7b1530,#b22a4a);color:white;font-weight:800;display:none;z-index:999}
+.stat{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.02)}
+.leader{max-height:280px;overflow:auto;margin-top:8px}
+.tiny{font-size:12px;color:rgba(255,255,255,0.6)}
+.impossible{color:#cc6f6f;font-weight:800}
+.controls{display:flex;gap:8px;align-items:center}
+button.full{width:100%}
+.choice .letter{display:inline-block;width:28px;height:28px;border-radius:6px;background:linear-gradient(90deg,var(--bronze),#b77a1a);color:#081010;font-weight:900;text-align:center;line-height:28px;margin-right:10px}
 </style>
 </head>
 <body>
+<div class="container">
+  <div class="header">
+    <h1>📜 ÊXODO — Quiz (Velho Testamento)</h1>
+    <div class="meta">50 perguntas • se errar volta à 1ª • tempo continua</div>
+  </div>
 
-<div id="timer">⏱️ 0s</div>
+  <div class="layout">
+    <!-- LEFT -->
+    <div class="panel card">
+      <!-- START -->
+      <section id="screen-start" class="qscreen active" aria-hidden="false">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="logo">VT<br><span style="font-size:11px;color:var(--gold)">ÊXODO</span></div>
+          <div>
+            <div style="font-weight:800;font-size:16px">Quiz — Êxodo</div>
+            <div class="tiny" style="margin-top:6px">Digite seu nome e toque em <strong>Começar</strong>. O cronômetro inicia ao tocar e NÃO zera se errar.</div>
+          </div>
+        </div>
 
-<!-- Tela de nome -->
-<div class="screen active" id="nameScreen">
-  <h1>🕎 Quiz de Êxodo</h1>
-  <p>Digite seu nome para começar o desafio:</p>
-  <input type="text" id="playerName" placeholder="Seu nome">
-  <br><br>
-  <button onclick="startGame()">Iniciar</button>
+        <div style="margin-top:14px">
+          <label class="tiny">Seu nome</label>
+          <input id="playerName" type="text" placeholder="Ex: João" />
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <button id="btnStart" class="btn primary full">Começar</button>
+            <button id="btnResetAll" class="btn ghost">Resetar Tudo</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUESTIONS wrapper -->
+      <div id="questionsWrapper"></div>
+
+      <!-- FAIL -->
+      <section id="screen-fail" class="qscreen" aria-hidden="true">
+        <div style="text-align:center">
+          <div style="font-size:22px;font-weight:900;color:#b2313b">MISERICÓRDIA</div>
+          <div id="failText" style="margin-top:12px;font-weight:800;font-size:16px"></div>
+          <div style="margin-top:14px;display:flex;gap:8px;justify-content:center">
+            <button id="btnRestartFromFail" class="btn primary">Recomeçar (volta à 1ª)</button>
+            <button id="btnResetFromFail" class="btn ghost">Resetar Tudo</button>
+          </div>
+          <div class="tiny" style="margin-top:10px">O tempo NÃO é zerado — ele continua contando enquanto você tenta de novo.</div>
+        </div>
+      </section>
+
+      <!-- FINAL -->
+      <section id="screen-final" class="qscreen" aria-hidden="true">
+        <div style="text-align:center">
+          <div style="font-size:22px;font-weight:900;color:var(--gold)">🎉 PARABÉNS!</div>
+          <div id="finalText" style="margin-top:12px;font-weight:800;font-size:16px"></div>
+          <div style="margin-top:12px" class="tiny">Tempo: <span id="finalTime" style="font-weight:900;color:var(--gold)"></span></div>
+          <div style="margin-top:12px;display:flex;gap:8px;justify-content:center">
+            <button id="btnSave" class="btn primary">Salvar no ranking</button>
+            <button id="btnPlayAgain" class="btn ghost">Jogar de novo (mesmo nome)</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- RIGHT -->
+    <aside class="panel card" style="display:flex;flex-direction:column;gap:12px">
+      <div class="stat">
+        <div>
+          <div class="tiny">Jogador</div>
+          <div id="labelPlayer" style="font-weight:800">—</div>
+        </div>
+        <div style="text-align:right">
+          <div class="tiny">Nível</div>
+          <div style="font-weight:800;color:var(--gold)">Velho Testamento</div>
+        </div>
+      </div>
+
+      <div class="stat">
+        <div>
+          <div class="tiny">Cronômetro</div>
+          <div id="timerLarge" style="font-weight:900;font-size:18px">00:00.000</div>
+        </div>
+        <div style="text-align:right">
+          <div class="tiny">Progresso</div>
+          <div id="progressSmall" style="font-weight:800">0 / 50</div>
+        </div>
+      </div>
+
+      <div class="stat" style="flex-direction:column;align-items:flex-start">
+        <div class="tiny" style="margin-bottom:8px">Ranking local (melhores tempos)</div>
+        <div class="leader" id="leaderboard"></div>
+        <div style="width:100%;display:flex;gap:8px;margin-top:8px">
+          <button id="btnClear" class="btn ghost" style="flex:1">Limpar ranking</button>
+          <button onclick="location.href='velho.html'" class="btn ghost" style="flex:1">Voltar</button>
+        </div>
+      </div>
+
+      <div class="tiny">Dica: últimas 20 perguntas são mais difíceis; últimas 5 quase impossíveis.</div>
+    </aside>
+  </div>
 </div>
 
-<!-- Tela de explicação -->
-<div class="screen" id="introScreen">
-  <h2>📖 Êxodo</h2>
-  <p>Responda corretamente todas as 50 perguntas para provar seu conhecimento!<br>
-  Mas cuidado... se errar, volta do início!<br><br>Boa sorte, servo do Altíssimo!</p>
-  <button onclick="showQuestion(0)">Começar</button>
-</div>
-
-<!-- Tela de pergunta -->
-<div class="screen" id="quizScreen">
-  <h2 id="questionText"></h2>
-  <div id="choices"></div>
-</div>
-
-<!-- Tela de erro -->
-<div class="screen" id="wrongScreen">
-  <h2 id="wrongMessage"></h2>
-  <button onclick="resetQuiz()">🔁 Tentar novamente</button>
-</div>
-
-<!-- Tela final -->
-<div class="screen" id="endScreen">
-  <h1>🏆 Parabéns, <span id="playerEndName"></span>!</h1>
-  <p>Você completou o quiz de Êxodo em <span id="finalTime"></span> segundos!</p>
-  <button onclick="resetQuiz()">Jogar novamente</button>
-</div>
+<div id="floatingFail" class="failure-banner"></div>
 
 <script>
-let questions = [
-  {q:"Quem liderou o povo de Israel na saída do Egito?",a:["Moisés","Josué","Abraão","Aarão"],c:0},
-  {q:"Qual era o nome do irmão de Moisés?",a:["Arão","Calebe","Esaú","José"],c:0},
-  {q:"Em qual monte Moisés recebeu os Dez Mandamentos?",a:["Monte Sinai","Monte Carmelo","Monte Sião","Monte Horebe"],c:0},
-  {q:"Quantas pragas Deus enviou ao Egito?",a:["10","7","12","5"],c:0},
-  {q:"O que o povo comeu no deserto?",a:["Maná","Pães de cevada","Mel","Peixe"],c:0},
-  {q:"O que o mar Vermelho simboliza?",a:["Libertação","Guerra","Paz","Riqueza"],c:0},
-  {q:"Quem perseguiu os israelitas até o mar Vermelho?",a:["Faraó","Nabucodonosor","Hamã","Herodes"],c:0},
-  {q:"Qual era a profissão de Moisés antes de voltar ao Egito?",a:["Pastor de ovelhas","Carpinteiro","Ferreiro","Sacerdote"],c:0},
-  {q:"Quem falou com Moisés na sarça ardente?",a:["Deus","Um anjo","Arão","Elias"],c:0},
-  {q:"Qual foi a primeira praga do Egito?",a:["Água em sangue","Rãs","Piolhos","Trevas"],c:0},
-  // ... (até 50, variando dificuldade — últimas 5 impossíveis)
-  {q:"O que estava dentro da arca do testemunho?",a:["Tábuas da lei, maná e vara de Arão","Somente tábuas da lei","Somente o maná","Somente a vara"],c:0},
-  {q:"Quem construiu o bezerro de ouro?",a:["Arão","Moisés","Josué","Corá"],c:0},
-  {q:"Quantos anos os israelitas ficaram no deserto?",a:["40","7","70","100"],c:0},
-  {q:"Como Deus guiava o povo durante o dia?",a:["Coluna de nuvem","Coluna de fogo","Arco-íris","Som de trombeta"],c:0},
-  {q:"E à noite?",a:["Coluna de fogo","Coluna de nuvem","Estrela","Anjo"],c:0},
-  {q:"Qual o significado de 'Êxodo'?",a:["Saída","Guerra","Criação","Promessa"],c:0},
-  {q:"Quem segurou as mãos de Moisés para vencer os amalequitas?",a:["Arão e Hur","Josué e Calebe","Nadabe e Abiú","Levi e Simeão"],c:0},
-  {q:"Qual foi a última praga?",a:["Morte dos primogênitos","Trevas","Chuva de fogo","Piolhos"],c:0},
-  {q:"Como o povo reagiu ao bezerro de ouro?",a:["Adoraram","Rejeitaram","Destruíram","Ignoraram"],c:0},
-  {q:"Quem escreveu os Dez Mandamentos?",a:["O próprio Deus","Moisés","Arão","Josué"],c:0},
-  // Difíceis
-  {q:"O que significava o cordeiro da Páscoa?",a:["Símbolo de Cristo","Símbolo do Egito","Símbolo da guerra","Símbolo de riqueza"],c:0},
-  {q:"Quantos dias Moisés ficou no monte recebendo as tábuas?",a:["40 dias e 40 noites","7 dias","10 dias","12 dias"],c:0},
-  {q:"Qual foi o pecado de Nadabe e Abiú?",a:["Ofereceram fogo estranho","Roubaram ouro","Negaram Moisés","Não guardaram o sábado"],c:0},
-  {q:"Onde Moisés golpeou a rocha?",a:["Meribá","Horebe","Refidim","Sinai"],c:0},
-  {q:"Quem sucedeu Moisés?",a:["Josué","Arão","Calebe","Elias"],c:0},
-  // Impossíveis 😈
-  {q:"Qual era o nome do pai de Moisés?",a:["Anrão","Jetro","Levi","Noé"],c:0},
-  {q:"E o nome da mãe de Moisés?",a:["Joquebede","Zípora","Miriã","Rebeca"],c:0},
-  {q:"Quantas vezes o faraó endureceu o coração antes da última praga?",a:["9","5","10","3"],c:0},
-  {q:"Em que capítulo do Êxodo está a travessia do mar?",a:["Capítulo 14","Capítulo 10","Capítulo 20","Capítulo 7"],c:0},
-  {q:"Qual o nome do cântico após a travessia?",a:["Cântico de Moisés","Cântico do mar","Hino da vitória","Salmo de libertação"],c:0},
+/* ================= QUESTIONS (50) — ÊXODO =================
+   - First 30: medium
+   - 31-45: harder
+   - 46-50: "IMPOSSÍVEIS" (answer = option that says "Não é especificado" or similar)
+*/
+const QUESTIONS = [
+ {id:1,type:'📖',q:'Quem liderou a saída do povo de Israel do Egito?',choices:['Moisés','Josué','Arão','Calebe'],answer:0},
+ {id:2,type:'📖',q:'Qual era o nome do irmão de Moisés que falava por ele?',choices:['Arão','Nadabe','Abiú','Hur'],answer:0},
+ {id:3,type:'📖',q:'Onde Moisés encontrou a sarça ardente?',choices:['Monte Horebe','Monte Sinai','Monte Carmelo','Jerusalém'],answer:0},
+ {id:4,type:'📖',q:'Quantas pragas Deus enviou ao Egito?',choices:['7','10','12','5'],answer:1},
+ {id:5,type:'📖',q:'Qual foi a primeira praga?',choices:['Água em sangue','Rãs','Gafanhotos','Trevas'],answer:0},
+ {id:6,type:'📖',q:'O que o povo recebeu do céu no deserto?',choices:['Maná','Mel','Carne de aves','Água'],answer:0},
+ {id:7,type:'📖',q:'Como Deus guiava os israelitas durante o dia?',choices:['Coluna de nuvem','Coluna de fogo','Estrelas','Trombetas'],answer:0},
+ {id:8,type:'📖',q:'E à noite?',choices:['Coluna de fogo','Coluna de nuvem','Lua','Anjos'],answer:0},
+ {id:9,type:'📖',q:'Que sinal marcou a páscoa antes da saída do Egito?',choices:['Sangue nas portas','Tocha no telhado','Cordeiro morto','Pão sem fermento'],answer:0},
+ {id:10,type:'📖',q:'Quem era o faraó que resistiu aos pedidos de libertação (nome popular)?',choices:['Ramsés','Tutankamon','Neferefré','Menés'],answer:0},
+ {id:11,type:'📖',q:'Qual foi o milagre que abriu passagem para os israelitas?',choices:['Mar Vermelho se abriu','Terra partiu','Torre caiu','Montanha dividida'],answer:0},
+ {id:12,type:'📖',q:'Quem tocou no cajado e o transformou em serpente diante do faraó?',choices:['Moisés','Arão','Josué','Calebe'],answer:0},
+ {id:13,type:'📖',q:'Quem foi o porta-voz que ajudou Moisés perante o povo?',choices:['Arão','Hur','Nadabe','Abiú'],answer:0},
+ {id:14,type:'📖',q:'Onde o povo acampou antes de receber a lei?',choices:['Monte Sinai','Vale do Jordão','Betel','Esmirna'],answer:0},
+ {id:15,type:'📖',q:'Quem construiu o bezerro de ouro?',choices:['Arão','Moisés','Os anciãos','Josué'],answer:0},
+ {id:16,type:'📖',q:'Quantos anos os israelitas vagaram no deserto (tradição bíblica)?',choices:['20','40','70','50'],answer:1},
+ {id:17,type:'📖',q:'Que objeto carregava as tábuas da lei?',choices:['Arca do Testemunho','Tabernáculo','Cálice','Altar'],answer:0},
+ {id:18,type:'📖',q:'Quem foi o líder que sucedeu Moisés?',choices:['Josué','Arão','Calebe','Elias'],answer:0},
+ {id:19,type:'📖',q:'Qual era o papel do Tabernáculo?',choices:['Lugar de encontros com Deus','Palácio do rei','Biblioteca','Marinha'],answer:0},
+ {id:20,type:'📖',q:'O que era o maná frequentemente comparado?',choices:['Sementes','Pão do céu','Dinheiro','Pedra'],answer:1},
+ {id:21,type:'📖',q:'Quem defendeu Moisés quando sua autoridade foi questionada?',choices:['Jetro','Arão','Hur','Josué'],answer:2},
+ {id:22,type:'📖',q:'Quem foi punido por trazer fogo estranho ao altar?',choices:['Nadabe e Abiú','Corá e seus homens','Arão e seus filhos','Miriã e Arão'],answer:0},
+ {id:23,type:'📖',q:'Onde foram guardadas as tábuas após serem quebradas?',choices:['Arca do Testemunho','Enterradas','Queimadas','Perdidas'],answer:0},
+ {id:24,type:'📖',q:'Quem subiu ao monte para receber a lei inicialmente?',choices:['Moisés','Arão','Josué','Calebe'],answer:0},
+ {id:25,type:'📖',q:'Qual era a cerimônia que marcava a santidade do Tabernáculo?',choices:['Consagração dos sacerdotes','Casamento','Sacrifício de guerra','Festival do vinho'],answer:0},
+ {id:26,type:'📖',q:'Qual elemento representava a presença de Deus sobre o tabernáculo?',choices:['Nuvem e fogo','Água','Terra','Vento'],answer:0},
+ {id:27,type:'📖',q:'Quem era a irmã de Moisés que cantou após a travessia?',choices:['Miriã','Débora','Rute','Ester'],answer:0},
+ {id:28,type:'📖',q:'Qual era o nome do lugar onde faltou água e Moisés feriu a rocha?',choices:['Meribá','Ribla','Betel','Gibeá'],answer:0},
+ {id:29,type:'📖',q:'Quem foi escolhido para liderar os ataques contra Amaleque?',choices:['Josué','Moisés','Calebe','Arão'],answer:0},
+ {id:30,type:'📖',q:'O que as pragas demonstraram sobre os deuses do Egito?',choices:['Que eram impotentes','Que eram verdadeiros','Que se multiplicavam','Que eram agradáveis'],answer:0},
+
+ // 31-45 difíceis
+ {id:31,type:'🔮',q:'Qual foi o significado da serpente de bronze (Números/Êxodo contexto)?',choices:['Cura e símbolo de fé','Magia','Punição','Agricultura'],answer:0},
+ {id:32,type:'🔮',q:'Quem era Jetro (Reuel) na história de Moisés?',choices:['Sogro de Moisés','General do Egito','Sacerdote do Faraó','Irmão de Arão'],answer:0},
+ {id:33,type:'🔮',q:'O que Moisés quebrou ao descer do monte?',choices:['Tábuas da Lei','A Arca','O Tabernáculo','O Altar'],answer:0},
+ {id:34,type:'🔮',q:'Qual era a função dos levitas inicialmente?',choices:['Servir no Tabernáculo','Serem reis','Serem profetas','Trabalhadores agrícolas'],answer:0},
+ {id:35,type:'🔮',q:'Que oferta era feita no Yom Kippur (Dia da Expiação)?',choices:['Sacrifício anual especial','Oferta de vinho','Oferta de incenso','Oferta de pão'],answer:0},
+ {id:36,type:'🔮',q:'Como eram identificados os sacerdotes legitimamente?',choices:['Descendência de Arão','Escolha popular','Eleição por voto','Conquista militar'],answer:0},
+ {id:37,type:'🔮',q:'Quem sucedeu Nadabe e Abiú após seu pecado?',choices:['Seus irmãos ou filhos designados','Moisés','Arão','Ninguém'],answer:0},
+ {id:38,type:'🔮',q:'Qual era o propósito das festas (p.ex. Páscoa) para Israel?',choices:['Lembrança da libertação','Celebrar colheita','Casamentos','Rituais de guerra'],answer:0},
+ {id:39,type:'🔮',q:'O que simbolizava a nuvem sobre o Tabernáculo?',choices:['Presença de Deus','Sombra natural','Armadura','Sombria maldição'],answer:0},
+ {id:40,type:'🔮',q:'Qual foi a reação do faraó depois da décima praga?',choices:['Deixou o povo partir','Prendeu mais o povo','Escondeu o ouro','Mudou de religião'],answer:0},
+ {id:41,type:'🔮',q:'Quem foram os montes associados a revelação e mediação?',choices:['Horebe/Sinai','Carmelo e Sião','Tabor e Hermom','Galaad e Ebal'],answer:0},
+ {id:42,type:'🔮',q:'Que papel tinha o éfode entre os sacerdotes?',choices:['Instrumento ritual e de consulta','Arma','Instrumento agrícola','Vestimenta comum'],answer:0},
+ {id:43,type:'🔮',q:'Quem foi Corá na narrativa do êxodo?',choices:['Líder de uma rebelião contra Moisés','Sacerdote leal','General do exército','Profeta estrangeiro'],answer:0},
+ {id:44,type:'🔮',q:'Qual era a importância da consagração dos sacerdotes?',choices:['Permitir o serviço sagrado','Dar poder político','Autorizar casamentos','Permitir comércio'],answer:0},
+ {id:45,type:'🔮',q:'Qual era a consequência do toque indevido do santuário?',choices:['Morte ou punição severa','Promoção','Bênção','Imunidade'],answer:0},
+
+ // 46-50 impossíveis (respostas que apontam "Não é especificado")
+ {id:46,type:'🔮',q:'IMPOSSÍVEL: Qual era a cor exata das tábuas originais?',choices:['Dourado','Marfim','Não é especificado','Vermelho'],answer:2,impossible:true},
+ {id:47,type:'🔮',q:'IMPOSSÍVEL: Quantos sacrifícios exatamente foram feitos no período inteiro do Tabernáculo?',choices:['1234','5678','Não é especificado','9999'],answer:2,impossible:true},
+ {id:48,type:'🔮',q:'IMPOSSÍVEL: Qual era a melodia que Miriã cantou após o mar?',choices:['Canção de Moisés','Hino perdido','Não é especificado','Cântico do sol'],answer:2,impossible:true},
+ {id:49,type:'🔮',q:'IMPOSSÍVEL: Quantos passos cada israelita deu durante a travessia do mar?',choices:['123','1','Não é especificado','0'],answer:2,impossible:true},
+ {id:50,type:'🔮',q:'IMPOSSÍVEL: Qual era o perfume exato usado no incenso do Tabernáculo?',choices:['Nardo','Mirra','Não é especificado','Incenso aromático'],answer:2,impossible:true}
 ];
 
-let playerName = "";
-let time = 0;
-let timerInterval;
+/* ================= STATE ================= */
+let player = '';
+let index = 0; // question index 0-based
+let started = false;
+let startTimestamp = null;
+let timerInterval = null;
 
-function startGame(){
-  const nameInput = document.getElementById("playerName").value.trim();
-  if(nameInput === "") return alert("Digite seu nome!");
-  playerName = nameInput;
-  document.getElementById("nameScreen").classList.remove("active");
-  document.getElementById("introScreen").classList.add("active");
-  timerInterval = setInterval(()=>{time++; document.getElementById("timer").innerText="⏱️ "+time+"s"},1000);
+/* ================= DOM ================= */
+const startScreen = document.getElementById('screen-start');
+const questionsWrapper = document.getElementById('questionsWrapper');
+const failScreen = document.getElementById('screen-fail');
+const finalScreen = document.getElementById('screen-final');
+const btnStart = document.getElementById('btnStart');
+const btnResetAll = document.getElementById('btnResetAll');
+const btnRestartFromFail = document.getElementById('btnRestartFromFail');
+const btnResetFromFail = document.getElementById('btnResetFromFail');
+const btnSave = document.getElementById('btnSave');
+const btnPlayAgain = document.getElementById('btnPlayAgain');
+const failText = document.getElementById('failText');
+const finalText = document.getElementById('finalText');
+const finalTime = document.getElementById('finalTime');
+const labelPlayer = document.getElementById('labelPlayer');
+const timerLarge = document.getElementById('timerLarge');
+const progressSmall = document.getElementById('progressSmall');
+const leaderboardEl = document.getElementById('leaderboard');
+const btnClear = document.getElementById('btnClear');
+const floatingFail = document.getElementById('floatingFail');
+
+const TOTAL = QUESTIONS.length;
+
+/* ================= MESSAGES (7) ================= */
+const FAIL_MESSAGES = [
+  'MISERICÓRDIA, {name}!',
+  'O Faraó venceu dessa vez, {name}!',
+  'Deus te dará outra chance, {name}!',
+  'As águas se fecharam, {name} 😭',
+  'Volta pro começo, {name} — aprende aí!',
+  '{name}, errou feio 😅',
+  'Tenta de novo, servo fiel: {name}!'
+];
+
+/* ================ HELPERS ================ */
+function fmtTime(ms){
+  const s = Math.floor(ms/1000);
+  const mm = Math.floor(s/60).toString().padStart(2,'0');
+  const ss = (s % 60).toString().padStart(2,'0');
+  const msRem = (ms % 1000).toString().padStart(3,'0');
+  return `${mm}:${ss}.${msRem}`;
+}
+function showFloating(text){
+  floatingFail.textContent = text;
+  floatingFail.style.display = 'block';
+  setTimeout(()=> floatingFail.style.opacity = '1',10);
+  setTimeout(()=> { floatingFail.style.opacity = '0'; setTimeout(()=> floatingFail.style.display='none',300); },1600);
 }
 
-function showQuestion(i){
-  if(i>=questions.length){
-    endQuiz(); return;
-  }
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById("quizScreen").classList.add("active");
-  let q = questions[i];
-  document.getElementById("questionText").innerText = "Pergunta "+(i+1)+": "+q.q;
-  let choicesHTML = "";
-  q.a.forEach((alt,idx)=>{
-    choicesHTML += `<div class='choice' onclick='checkAnswer(${i},${idx})'>${alt}</div>`;
+/* ================ TIMER ================ */
+function startTimerIfNeeded(){
+  if(startTimestamp === null) startTimestamp = performance.now();
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(()=> {
+    const elapsed = Math.floor(performance.now() - startTimestamp);
+    timerLarge.textContent = fmtTime(elapsed);
+    progressSmall.textContent = `${index}/${TOTAL}`;
+  }, 80);
+}
+function stopTimer(){
+  if(timerInterval){ clearInterval(timerInterval); timerInterval = null; }
+}
+function getElapsed(){
+  if(!startTimestamp) return 0;
+  return Math.floor(performance.now() - startTimestamp);
+}
+
+/* ================ BUILD QUESTIONS UI ================ */
+function buildQuestionScreens(){
+  questionsWrapper.innerHTML = '';
+  QUESTIONS.forEach((q, idx) => {
+    const sec = document.createElement('section');
+    sec.className = 'qscreen panel';
+    sec.id = 'q-'+idx;
+    const meta = document.createElement('div'); meta.className='q-meta';
+    meta.innerHTML = `<div class="tiny">${q.type || '🔹'} ${q.impossible?'<span class="impossible">• IMPOSSÍVEL</span>':''}</div><div class="tiny">Pergunta ${idx+1} / ${TOTAL}</div>`;
+    const qText = document.createElement('div'); qText.className='q-text'; qText.textContent = q.q;
+    const choices = document.createElement('div'); choices.className='choices';
+    q.choices.forEach((c, ci)=>{
+      const b = document.createElement('button');
+      b.className = 'choice';
+      b.innerHTML = `<span class="letter">${String.fromCharCode(65+ci)}</span> <span style="vertical-align:middle">${c}</span>`;
+      b.addEventListener('click', ()=> handleAnswer(idx, ci));
+      choices.appendChild(b);
+    });
+    sec.appendChild(meta); sec.appendChild(qText); sec.appendChild(choices);
+    questionsWrapper.appendChild(sec);
   });
-  document.getElementById("choices").innerHTML = choicesHTML;
 }
 
-function checkAnswer(i, choice){
-  if(choice === questions[i].c){
-    showQuestion(i+1);
+/* ================ LEADERBOARD ================ */
+function renderLeaderboard(){
+  const key = 'exodo_quiz_rank';
+  let arr = [];
+  try{ arr = JSON.parse(localStorage.getItem(key) || '[]'); }catch(e){ arr = []; }
+  arr.sort((a,b)=> a.timeMs - b.timeMs);
+  leaderboardEl.innerHTML = '';
+  if(arr.length === 0){ leaderboardEl.innerHTML = '<div class="tiny">Nenhum campeão ainda — seja o primeiro!</div>'; return; }
+  arr.slice(0,10).forEach((r,i)=>{
+    const row = document.createElement('div');
+    row.style.display='flex'; row.style.justifyContent='space-between'; row.style.padding='6px 0'; row.style.borderBottom='1px dashed rgba(255,255,255,0.03)';
+    row.innerHTML = `<div style="font-weight:800">#${i+1} ${escapeHtml(r.name)}</div><div class="tiny">${fmtTime(r.timeMs)}</div>`;
+    leaderboardEl.appendChild(row);
+  });
+}
+
+/* ================ FLOW ================ */
+btnStart.addEventListener('click', ()=>{
+  const nameVal = (document.getElementById('playerName').value || '').trim();
+  if(!nameVal){ const ip = document.getElementById('playerName'); ip.style.border='1px solid #f66'; ip.focus(); setTimeout(()=> ip.style.border='',800); return; }
+  player = nameVal;
+  labelPlayer.textContent = player;
+  index = 0;
+  started = true;
+  buildQuestionScreens();
+  startTimerIfNeeded();
+  showScreenByIndex(0);
+  renderLeaderboard();
+});
+
+btnResetAll.addEventListener('click', ()=>{
+  if(!confirm('Resetar tudo: zera tempo, progresso e nome?')) return;
+  player = '';
+  index = 0;
+  started = false;
+  startTimestamp = null;
+  stopTimer();
+  timerLarge.textContent = '00:00.000';
+  progressSmall.textContent = `0 / ${TOTAL}`;
+  document.getElementById('playerName').value = '';
+  labelPlayer.textContent = '—';
+  showScreen(startScreen);
+});
+
+btnRestartFromFail.addEventListener('click', ()=>{
+  index = 0;
+  showScreenByIndex(0);
+});
+
+btnResetFromFail.addEventListener('click', ()=>{
+  if(!confirm('Resetar tudo: zera tempo, progresso e nome?')) return;
+  player = '';
+  index = 0;
+  started = false;
+  startTimestamp = null;
+  stopTimer();
+  timerLarge.textContent = '00:00.000';
+  progressSmall.textContent = `0 / ${TOTAL}`;
+  document.getElementById('playerName').value = '';
+  labelPlayer.textContent = '—';
+  showScreen(startScreen);
+});
+
+btnPlayAgain.addEventListener('click', ()=>{
+  index = 0;
+  startTimestamp = performance.now();
+  startTimerIfNeeded();
+  showScreenByIndex(0);
+});
+
+btnSave.addEventListener('click', ()=>{
+  const elapsed = getElapsed();
+  const key = 'exodo_quiz_rank';
+  let arr = [];
+  try{ arr = JSON.parse(localStorage.getItem(key) || '[]'); }catch(e){ arr=[]; }
+  arr.push({ name: player || '—', timeMs: elapsed, date: new Date().toISOString() });
+  if(arr.length>200) arr = arr.slice(arr.length-200);
+  localStorage.setItem(key, JSON.stringify(arr));
+  renderLeaderboard();
+  alert('Salvo no ranking local!');
+});
+
+btnClear.addEventListener('click', ()=>{
+  if(confirm('Limpar ranking local?')){ localStorage.removeItem('exodo_quiz_rank'); renderLeaderboard(); }
+});
+
+/* ================ ANSWER HANDLING ================ */
+function handleAnswer(qIdx, choiceIdx){
+  if(!started) return;
+  const q = QUESTIONS[qIdx];
+  const correct = (choiceIdx === q.answer);
+  if(correct){
+    const next = qIdx + 1;
+    index = next;
+    if(next >= TOTAL){
+      const elapsed = getElapsed();
+      finalText.textContent = `PARABÉNS ${player.toUpperCase()} — Você concluiu!`;
+      finalTime.textContent = fmtTime(elapsed);
+      showScreen(finalScreen);
+    } else {
+      showScreenByIndex(next);
+    }
   } else {
-    wrongAnswer();
+    // wrong: show fail screen, set index to 0 but DO NOT stop timer
+    const tpl = FAIL_MESSAGES[Math.floor(Math.random()*FAIL_MESSAGES.length)];
+    const msg = tpl.replace('{name}', player || 'amigo');
+    failText.textContent = msg;
+    showScreen(failScreen);
+    index = 0;
+    showFloating(msg);
   }
 }
 
-function wrongAnswer(){
-  const msgs = [
-    `MISERICÓRDIA, ${playerName}!`,
-    `O faraó venceu dessa vez, ${playerName}!`,
-    `Tenta de novo, ${playerName}!`,
-    `Você tropeçou no deserto, ${playerName}!`
-  ];
-  const msg = msgs[Math.floor(Math.random()*msgs.length)];
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById("wrongScreen").classList.add("active");
-  document.getElementById("wrongMessage").innerText = msg;
+/* ================ UI HELPERS ================ */
+function showScreen(el){
+  document.querySelectorAll('.qscreen').forEach(s=>{ s.classList.remove('active'); s.setAttribute('aria-hidden','true'); });
+  el.classList.add('active'); el.setAttribute('aria-hidden','false');
 }
+function showScreenByIndex(i){
+  const sec = document.getElementById('q-'+i);
+  if(!sec) return;
+  showScreen(sec);
+  progressSmall.textContent = `${i}/${TOTAL}`;
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-function resetQuiz(){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById("introScreen").classList.add("active");
-}
-
-function endQuiz(){
-  clearInterval(timerInterval);
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById("endScreen").classList.add("active");
-  document.getElementById("playerEndName").innerText = playerName;
-  document.getElementById("finalTime").innerText = time;
-}
+/* ================ INIT ================ */
+(function init(){
+  buildQuestionScreens();
+  renderLeaderboard();
+  timerLarge.textContent = '00:00.000';
+  progressSmall.textContent = `0 / ${TOTAL}`;
+})();
 </script>
 </body>
 </html>
+

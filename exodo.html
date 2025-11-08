@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Êxodo – Estudo Bíblico</title>
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(180deg, #0a0a0a, #1a1a1a);
+  color: #f5e6a0;
+  text-align: center;
+  user-select: none;
+}
+.screen { display: none; padding: 30px; }
+.active { display: block; }
+button {
+  background: linear-gradient(180deg, #b8860b, #8b6508);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 1.1em;
+  margin: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+button:hover { transform: scale(1.05); }
+input {
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  font-size: 1.1em;
+  text-align: center;
+}
+.choice {
+  background: linear-gradient(180deg, #1f1f1f, #292929);
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(212,175,55,0.3);
+  color: #f5e6a0;
+  cursor: pointer;
+  margin: 10px auto;
+  width: 90%;
+  max-width: 400px;
+  transition: 0.2s;
+}
+.choice:hover { background: linear-gradient(180deg, #2b2b2b, #3b3b3b); }
+#timer { position: fixed; top: 10px; right: 20px; font-size: 1.1em; color: #d4af37; }
+</style>
+</head>
+<body>
+
+<div id="timer">⏱️ 0s</div>
+
+<!-- Tela de nome -->
+<div class="screen active" id="nameScreen">
+  <h1>🕎 Quiz de Êxodo</h1>
+  <p>Digite seu nome para começar o desafio:</p>
+  <input type="text" id="playerName" placeholder="Seu nome">
+  <br><br>
+  <button onclick="startGame()">Iniciar</button>
+</div>
+
+<!-- Tela de explicação -->
+<div class="screen" id="introScreen">
+  <h2>📖 Êxodo</h2>
+  <p>Responda corretamente todas as 50 perguntas para provar seu conhecimento!<br>
+  Mas cuidado... se errar, volta do início!<br><br>Boa sorte, servo do Altíssimo!</p>
+  <button onclick="showQuestion(0)">Começar</button>
+</div>
+
+<!-- Tela de pergunta -->
+<div class="screen" id="quizScreen">
+  <h2 id="questionText"></h2>
+  <div id="choices"></div>
+</div>
+
+<!-- Tela de erro -->
+<div class="screen" id="wrongScreen">
+  <h2 id="wrongMessage"></h2>
+  <button onclick="resetQuiz()">🔁 Tentar novamente</button>
+</div>
+
+<!-- Tela final -->
+<div class="screen" id="endScreen">
+  <h1>🏆 Parabéns, <span id="playerEndName"></span>!</h1>
+  <p>Você completou o quiz de Êxodo em <span id="finalTime"></span> segundos!</p>
+  <button onclick="resetQuiz()">Jogar novamente</button>
+</div>
+
+<script>
+let questions = [
+  {q:"Quem liderou o povo de Israel na saída do Egito?",a:["Moisés","Josué","Abraão","Aarão"],c:0},
+  {q:"Qual era o nome do irmão de Moisés?",a:["Arão","Calebe","Esaú","José"],c:0},
+  {q:"Em qual monte Moisés recebeu os Dez Mandamentos?",a:["Monte Sinai","Monte Carmelo","Monte Sião","Monte Horebe"],c:0},
+  {q:"Quantas pragas Deus enviou ao Egito?",a:["10","7","12","5"],c:0},
+  {q:"O que o povo comeu no deserto?",a:["Maná","Pães de cevada","Mel","Peixe"],c:0},
+  {q:"O que o mar Vermelho simboliza?",a:["Libertação","Guerra","Paz","Riqueza"],c:0},
+  {q:"Quem perseguiu os israelitas até o mar Vermelho?",a:["Faraó","Nabucodonosor","Hamã","Herodes"],c:0},
+  {q:"Qual era a profissão de Moisés antes de voltar ao Egito?",a:["Pastor de ovelhas","Carpinteiro","Ferreiro","Sacerdote"],c:0},
+  {q:"Quem falou com Moisés na sarça ardente?",a:["Deus","Um anjo","Arão","Elias"],c:0},
+  {q:"Qual foi a primeira praga do Egito?",a:["Água em sangue","Rãs","Piolhos","Trevas"],c:0},
+  // ... (até 50, variando dificuldade — últimas 5 impossíveis)
+  {q:"O que estava dentro da arca do testemunho?",a:["Tábuas da lei, maná e vara de Arão","Somente tábuas da lei","Somente o maná","Somente a vara"],c:0},
+  {q:"Quem construiu o bezerro de ouro?",a:["Arão","Moisés","Josué","Corá"],c:0},
+  {q:"Quantos anos os israelitas ficaram no deserto?",a:["40","7","70","100"],c:0},
+  {q:"Como Deus guiava o povo durante o dia?",a:["Coluna de nuvem","Coluna de fogo","Arco-íris","Som de trombeta"],c:0},
+  {q:"E à noite?",a:["Coluna de fogo","Coluna de nuvem","Estrela","Anjo"],c:0},
+  {q:"Qual o significado de 'Êxodo'?",a:["Saída","Guerra","Criação","Promessa"],c:0},
+  {q:"Quem segurou as mãos de Moisés para vencer os amalequitas?",a:["Arão e Hur","Josué e Calebe","Nadabe e Abiú","Levi e Simeão"],c:0},
+  {q:"Qual foi a última praga?",a:["Morte dos primogênitos","Trevas","Chuva de fogo","Piolhos"],c:0},
+  {q:"Como o povo reagiu ao bezerro de ouro?",a:["Adoraram","Rejeitaram","Destruíram","Ignoraram"],c:0},
+  {q:"Quem escreveu os Dez Mandamentos?",a:["O próprio Deus","Moisés","Arão","Josué"],c:0},
+  // Difíceis
+  {q:"O que significava o cordeiro da Páscoa?",a:["Símbolo de Cristo","Símbolo do Egito","Símbolo da guerra","Símbolo de riqueza"],c:0},
+  {q:"Quantos dias Moisés ficou no monte recebendo as tábuas?",a:["40 dias e 40 noites","7 dias","10 dias","12 dias"],c:0},
+  {q:"Qual foi o pecado de Nadabe e Abiú?",a:["Ofereceram fogo estranho","Roubaram ouro","Negaram Moisés","Não guardaram o sábado"],c:0},
+  {q:"Onde Moisés golpeou a rocha?",a:["Meribá","Horebe","Refidim","Sinai"],c:0},
+  {q:"Quem sucedeu Moisés?",a:["Josué","Arão","Calebe","Elias"],c:0},
+  // Impossíveis 😈
+  {q:"Qual era o nome do pai de Moisés?",a:["Anrão","Jetro","Levi","Noé"],c:0},
+  {q:"E o nome da mãe de Moisés?",a:["Joquebede","Zípora","Miriã","Rebeca"],c:0},
+  {q:"Quantas vezes o faraó endureceu o coração antes da última praga?",a:["9","5","10","3"],c:0},
+  {q:"Em que capítulo do Êxodo está a travessia do mar?",a:["Capítulo 14","Capítulo 10","Capítulo 20","Capítulo 7"],c:0},
+  {q:"Qual o nome do cântico após a travessia?",a:["Cântico de Moisés","Cântico do mar","Hino da vitória","Salmo de libertação"],c:0},
+];
+
+let playerName = "";
+let time = 0;
+let timerInterval;
+
+function startGame(){
+  const nameInput = document.getElementById("playerName").value.trim();
+  if(nameInput === "") return alert("Digite seu nome!");
+  playerName = nameInput;
+  document.getElementById("nameScreen").classList.remove("active");
+  document.getElementById("introScreen").classList.add("active");
+  timerInterval = setInterval(()=>{time++; document.getElementById("timer").innerText="⏱️ "+time+"s"},1000);
+}
+
+function showQuestion(i){
+  if(i>=questions.length){
+    endQuiz(); return;
+  }
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("quizScreen").classList.add("active");
+  let q = questions[i];
+  document.getElementById("questionText").innerText = "Pergunta "+(i+1)+": "+q.q;
+  let choicesHTML = "";
+  q.a.forEach((alt,idx)=>{
+    choicesHTML += `<div class='choice' onclick='checkAnswer(${i},${idx})'>${alt}</div>`;
+  });
+  document.getElementById("choices").innerHTML = choicesHTML;
+}
+
+function checkAnswer(i, choice){
+  if(choice === questions[i].c){
+    showQuestion(i+1);
+  } else {
+    wrongAnswer();
+  }
+}
+
+function wrongAnswer(){
+  const msgs = [
+    `MISERICÓRDIA, ${playerName}!`,
+    `O faraó venceu dessa vez, ${playerName}!`,
+    `Tenta de novo, ${playerName}!`,
+    `Você tropeçou no deserto, ${playerName}!`
+  ];
+  const msg = msgs[Math.floor(Math.random()*msgs.length)];
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("wrongScreen").classList.add("active");
+  document.getElementById("wrongMessage").innerText = msg;
+}
+
+function resetQuiz(){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("introScreen").classList.add("active");
+}
+
+function endQuiz(){
+  clearInterval(timerInterval);
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("endScreen").classList.add("active");
+  document.getElementById("playerEndName").innerText = playerName;
+  document.getElementById("finalTime").innerText = time;
+}
+</script>
+</body>
+</html>

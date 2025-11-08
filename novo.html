@@ -3,31 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Novo Testamento – Escolha o Quiz</title>
+<title>Novo Testamento</title>
 <style>
-body {
-  background: linear-gradient(135deg, #001f3f, #004080);
-  color: white;
-  font-family: 'Segoe UI', sans-serif;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 100vh; text-align: center; margin: 0;
-}
-h1 { font-size: 2em; margin-bottom: 40px; }
-button {
-  font-size: 1.2em; margin: 10px; padding: 15px 40px;
-  border: none; border-radius: 10px; cursor: pointer; transition: 0.3s;
-}
-button.active { background-color: #5cb8ff; color: black; }
-button.disabled {
-  background-color: #2a4b6b; color: #ccc; cursor: not-allowed;
-}
-button:hover:not(.disabled) { transform: scale(1.05); }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+  body{
+    height:100vh;
+    background:linear-gradient(180deg,#e0ecff,#cddfff);
+    color:#003366;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+  }
+  h1{
+    font-size:2em;
+    margin-bottom:20px;
+    text-shadow:0 0 10px rgba(0,51,102,0.3);
+  }
+  .buttons{
+    display:flex;
+    flex-wrap:wrap;
+    gap:20px;
+    justify-content:center;
+  }
+  .btn{
+    background:linear-gradient(180deg,#ffffff,#d6e6ff);
+    border:1px solid #8ab4f8;
+    color:#003366;
+    padding:15px 30px;
+    border-radius:10px;
+    font-size:1.1em;
+    cursor:pointer;
+    text-decoration:none;
+    transition:0.2s;
+  }
+  .btn:hover{
+    background:linear-gradient(180deg,#d6e6ff,#b9d4ff);
+    transform:scale(1.05);
+  }
+  .btn.disabled{
+    opacity:0.4;
+    cursor:not-allowed;
+  }
+  .back{
+    position:absolute;
+    bottom:20px;
+    left:20px;
+    color:#003366;
+    text-decoration:none;
+    font-weight:600;
+  }
 </style>
 </head>
 <body>
-<h1✝️ Novo Testamento<br>Escolha o Quiz</h1>
-<button class="active" onclick="location.href='apocalipse.html'">🔮 Apocalipse</button>
-<button class="disabled">📜 Paulo (Saulo) (em breve)</button>
-<button onclick="location.href='index.html'">⬅️ Voltar</button>
+  <h1>✝️ Novo Testamento</h1>
+  <p>Escolha o seu quiz:</p>
+  <div class="buttons">
+    <a href="apocalipse.html" class="btn">🔮 Apocalipse</a>
+    <a class="btn disabled">🕊️ Paulo / Saulo (em breve)</a>
+    <a class="btn disabled">📜 Atos (em breve)</a>
+  </div>
+  <a href="index.html" class="back">⬅ Voltar</a>
 </body>
 </html>
+

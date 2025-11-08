@@ -1,70 +1,73 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Novo Testamento</title>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
-  body{
-    height:100vh;
-    background:linear-gradient(180deg,#e0ecff,#cddfff);
-    color:#003366;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-  }
-  h1{
-    font-size:2em;
-    margin-bottom:20px;
-    text-shadow:0 0 10px rgba(0,51,102,0.3);
-  }
-  .buttons{
-    display:flex;
-    flex-wrap:wrap;
-    gap:20px;
-    justify-content:center;
-  }
-  .btn{
-    background:linear-gradient(180deg,#ffffff,#d6e6ff);
-    border:1px solid #8ab4f8;
-    color:#003366;
-    padding:15px 30px;
-    border-radius:10px;
-    font-size:1.1em;
-    cursor:pointer;
-    text-decoration:none;
-    transition:0.2s;
-  }
-  .btn:hover{
-    background:linear-gradient(180deg,#d6e6ff,#b9d4ff);
-    transform:scale(1.05);
-  }
-  .btn.disabled{
-    opacity:0.4;
-    cursor:not-allowed;
-  }
-  .back{
-    position:absolute;
-    bottom:20px;
-    left:20px;
-    color:#003366;
-    text-decoration:none;
-    font-weight:600;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Novo Testamento - Quizzes</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #e6f0ff, #ffffff);
+      color: #003366;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    h1 {
+      color: #003366;
+      font-size: 2em;
+      margin-bottom: 30px;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      border-radius: 12px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #0056b3;
+      transform: scale(1.05);
+    }
+    .back {
+      margin-top: 40px;
+      background: transparent;
+      color: #003366;
+      border: 2px solid #003366;
+      padding: 10px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+    .back:hover {
+      background: #003366;
+      color: #fff;
+    }
+  </style>
 </head>
 <body>
-  <h1>✝️ Novo Testamento</h1>
-  <p>Escolha o seu quiz:</p>
-  <div class="buttons">
-    <a href="apocalipse.html" class="btn">🔮 Apocalipse</a>
-    <a class="btn disabled">🕊️ Paulo / Saulo (em breve)</a>
-    <a class="btn disabled">📜 Atos (em breve)</a>
+  <h1>🌟 Escolha o Quiz do Novo Testamento</h1>
+  <div class="container">
+    <button onclick="window.location.href='apocalipse.html'">🔮 Apocalipse</button>
+    <button onclick="window.location.href='paulo.html'">✝️ Paulo (Saulo)</button>
   </div>
-  <a href="index.html" class="back">⬅ Voltar</a>
+  <button class="back" onclick="window.location.href='index.html'">⬅️ Voltar</button>
 </body>
 </html>
+
 

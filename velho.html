@@ -3,31 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Velho Testamento – Escolha o Quiz</title>
+<title>Velho Testamento</title>
 <style>
-body {
-  background: #0d0d0d;
-  color: gold;
-  font-family: 'Segoe UI', sans-serif;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 100vh; text-align: center; margin: 0;
-}
-h1 { font-size: 2em; margin-bottom: 40px; }
-button {
-  font-size: 1.2em; margin: 10px; padding: 15px 40px;
-  border: none; border-radius: 10px; cursor: pointer; transition: 0.3s;
-}
-button.active { background-color: gold; color: black; }
-button.disabled {
-  background-color: #333; color: #777; cursor: not-allowed;
-}
-button:hover:not(.disabled) { transform: scale(1.05); }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+  body{
+    height:100vh;
+    background:linear-gradient(180deg,#0b0b0c,#1c1c1c);
+    color:#f5e6a0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+  }
+  h1{
+    font-size:2em;
+    margin-bottom:20px;
+    text-shadow:0 0 10px rgba(212,175,55,0.4);
+  }
+  .buttons{
+    display:flex;
+    flex-wrap:wrap;
+    gap:20px;
+    justify-content:center;
+  }
+  .btn{
+    background:linear-gradient(180deg,#1c1c1c,#2b2b2b);
+    border:1px solid rgba(212,175,55,0.4);
+    color:#f5e6a0;
+    padding:15px 30px;
+    border-radius:10px;
+    font-size:1.1em;
+    cursor:pointer;
+    text-decoration:none;
+    transition:0.2s;
+  }
+  .btn:hover{
+    background:linear-gradient(180deg,#2b2b2b,#3c3c3c);
+    transform:scale(1.05);
+  }
+  .btn.disabled{
+    opacity:0.4;
+    cursor:not-allowed;
+  }
+  .back{
+    position:absolute;
+    bottom:20px;
+    left:20px;
+    color:#cbb676;
+    text-decoration:none;
+    font-weight:600;
+  }
 </style>
 </head>
 <body>
-<h1>🕎 Velho Testamento<br>Escolha o Quiz</h1>
-<button class="active" onclick="location.href='genesis.html'">📖 Gênesis</button>
-<button class="disabled">📜 Êxodo (em breve)</button>
-<button onclick="location.href='index.html'">⬅️ Voltar</button>
+  <h1>🕎 Velho Testamento</h1>
+  <p>Escolha o seu quiz:</p>
+  <div class="buttons">
+    <a href="genesis.html" class="btn">📜 Gênesis</a>
+    <a href="exodo.html" class="btn">🔥 Êxodo</a>
+    <a class="btn disabled">⚖️ Levítico (em breve)</a>
+    <a class="btn disabled">🌾 Deuteronômio (em breve)</a>
+  </div>
+  <a href="index.html" class="back">⬅ Voltar</a>
 </body>
 </html>
+

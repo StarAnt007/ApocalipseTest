@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz - Paulo</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #e6f0ff, #ffffff);
+      color: #003366;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      color: #003366;
+      margin-top: 30px;
+    }
+    .question-container {
+      margin: 20px auto;
+      max-width: 600px;
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 0 15px rgba(0, 51, 102, 0.2);
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .correct {
+      background-color: #28a745 !important;
+    }
+    .wrong {
+      background-color: #dc3545 !important;
+    }
+    .score {
+      font-size: 18px;
+      margin-top: 20px;
+    }
+    #timer {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📜 Quiz sobre Paulo (Saulo)</h1>
+  <div id="timer">⏰ Tempo: 60s</div>
+  <div class="question-container">
+    <h2 id="question"></h2>
+    <div class="options" id="options"></div>
+    <div class="score" id="score"></div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "Qual era o nome original de Paulo?",
+        options: ["Simão", "Saulo", "Tiago", "Estevão"],
+        correct: 1
+      },
+      {
+        question: "Em qual cidade Paulo nasceu?",
+        options: ["Jerusalém", "Tarso", "Roma", "Éfeso"],
+        correct: 1
+      },
+      {
+        question: "Antes de se converter, o que Paulo fazia?",
+        options: ["Perseguia cristãos", "Era pescador", "Construía templos", "Era sumo sacerdote"],
+        correct: 0
+      },
+      {
+        question: "Qual evento marcou a conversão de Paulo?",
+        options: ["Sonho com José", "Queda no caminho de Damasco", "Batismo no Jordão", "Visita ao templo"],
+        correct: 1
+      },
+      {
+        question: "Quem batizou Paulo após sua conversão?",
+        options: ["Pedro", "Ananias", "Tiago", "João"],
+        correct: 1
+      },
+      {
+        question: "Quantas viagens missionárias Paulo realizou?",
+        options: ["1", "2", "3", "4"],
+        correct: 2
+      },
+      {
+        question: "Para quem Paulo escreveu a carta aos Romanos?",
+        options: ["Cristãos de Jerusalém", "Cristãos de Roma", "Gregos de Atenas", "Hebreus de Corinto"],
+        correct: 1
+      },
+      {
+        question: "Em qual cidade Paulo foi preso pela última vez?",
+        options: ["Corinto", "Éfeso", "Roma", "Jerusalém"],
+        correct: 2
+      },
+      {
+        question: "Qual era a profissão de Paulo?",
+        options: ["Fabricante de tendas", "Pescador", "Pastor", "Escriba"],
+        correct: 0
+      },
+      {
+        question: "Como Paulo morreu segundo a tradição cristã?",
+        options: ["Crucificado", "Apedrejado", "Decapitado", "Açoitado até a morte"],
+        correct: 2
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let timeLeft = 60;
+    let timerInterval;
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").textContent = `⏰ Tempo: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          endQuiz();
+        }
+      }, 1000);
+    }
+
+    function loadQuestion() {
+      if (currentQuestion >= questions.length) return endQuiz();
+
+      const q = questions[currentQuestion];
+      document.getElementById("question").textContent = q.question;
+      const optionsContainer = document.getElementById("options");
+      optionsContainer.innerHTML = "";
+
+      q.options.forEach((option, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.onclick = () => selectOption(i, q.correct, btn);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function selectOption(selected, correct, btn) {
+      const buttons = document.querySelectorAll("button");
+      buttons.forEach(b => b.disabled = true);
+
+      if (selected === correct) {
+        btn.classList.add("correct");
+        score++;
+      } else {
+        btn.classList.add("wrong");
+      }
+
+      document.getElementById("score").textContent = `Pontuação: ${score}/${questions.length}`;
+
+      setTimeout(() => {
+        currentQuestion++;
+        loadQuestion();
+      }, 800);
+    }
+
+    function endQuiz() {
+      clearInterval(timerInterval);
+      document.querySelector(".question-container").innerHTML = `
+        <h2>Fim do Quiz!</h2>
+        <p>Sua pontuação final: ${score}/${questions.length}</p>
+      `;
+    }
+
+    startTimer();
+    loadQuestion();
+  </script>
+</body>
+</html>
